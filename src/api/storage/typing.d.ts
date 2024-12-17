@@ -1,0 +1,1 @@
+export type StorageContext =  "sync" | "session" | "local"

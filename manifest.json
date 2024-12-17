@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "BookmarkSaves",
+  "version": "1.0",
+
+  "description": "Baixa imagens, videos e GIFs de bookmarks salvos",
+
+  "icons": {
+    "48": "icons/bookmark_48.jpg",
+    "96": "icons/bookmark_96.jpg"
+  },
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "unlimitedStorage",
+    "nativeMessaging",
+    "cookies"
+  ],
+
+  "host_permissions": ["*://*.x.com/*"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "diogovf90@hotmail.com"
+    }
+  },
+
+  "background": {
+    "scripts": ["browser-polyfill.min.js", "background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*/saved/*"],
+      "js": ["browser-polyfill.min.js", "tools.js", "instagram.js"]
+    },
+    {
+      "matches": ["https://x.com/i/bookmarks"],
+      "js": ["browser-polyfill.min.js", "tools.js", "x.js"]
+    }
+  ],
+
+  "action": {
+    "default_icon": "icons/bookmark_48.jpg",
+    "default_title": "BookmarkSaves",
+    "default_popup": "index.html"
+  },
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src ws://localhost:8766"
+  }
+}

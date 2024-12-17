@@ -1,0 +1,10 @@
+{
+  "prose-wrap":"always",
+  "html-whitespace-sensitivity":"strict",
+  "end-of-line":"lf",
+  "quote-props":"consistent",  
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": false 
+}

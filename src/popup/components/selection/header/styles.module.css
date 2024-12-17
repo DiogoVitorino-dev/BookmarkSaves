@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 4px 8px;
+  background-color: var(--color-surface-container-high);
+  position: fixed;
+  z-index: 5;
+}
+
+.containerTitle {
+  flex: 1;
+  padding-left: 8px;
+  overflow: hidden;
+}
+
+.title {
+  font-size: var(--title-medium);
+  color: var(--color-on-surface);
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+}

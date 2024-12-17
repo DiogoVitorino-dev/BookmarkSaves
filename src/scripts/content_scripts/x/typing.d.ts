@@ -1,0 +1,2 @@
+export type XPost = HTMLElement;
+

@@ -1,0 +1,25 @@
+.icon {
+  width: inherit;
+  height: inherit;
+  color: inherit;
+  background-color: inherit;
+  margin: auto;
+}
+
+.button {  
+  border-radius: 50%;
+  transition: 300ms;
+  color: var(--color-on-secondary-container);
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.button:hover > .icon {
+  transform: scale(1.05);
+}
+
+.button:active > .icon {
+  transform: scale(0.95);
+}

@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.name {
+  font-size: var(--headline-small);
+  color: var(--color-on-surface);
+  margin-top: 8px;
+  margin-bottom: 16px;
+}

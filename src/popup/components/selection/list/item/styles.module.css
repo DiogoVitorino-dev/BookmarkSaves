@@ -1,0 +1,60 @@
+.container {
+  width: 140px;
+  height: 140px;
+  border-radius: 5px;
+  border: 1px solid var(--color-outline-variant);
+  filter: drop-shadow(1px 1px 2px var(--color-shadow));
+  margin: 6px 3px;
+  background-color: var(--color-surface-container-high);
+  position: relative;
+  user-select: none;
+  overflow: hidden;
+}
+
+.preview {
+  width: 140px;
+  transition: 300ms;
+}
+
+.preview:hover {
+  transform: scale(1.2);
+  filter: brightness(115%);
+  cursor: pointer;
+}
+
+.preview:active {
+  transform: scale(1);
+}
+
+.icon {
+  top: 15px;
+  position: absolute;
+}
+
+.icon_left {
+  left: 10px;
+}
+
+.icon_right {
+  right: 10px;
+}
+
+.unchecked {
+  filter: brightness(70%) saturate(70%);
+  transition: 100ms;
+}
+
+.checkedIcon {
+  width: 28px;
+  height: 28px;
+  transition: 300ms;
+}
+
+
+.mediaTypeIcon {
+  width: 28px;
+  height: 28px;
+  padding: 2px;
+  border-radius: 10px;
+  color: var(--color-secondary-fixed);
+}
