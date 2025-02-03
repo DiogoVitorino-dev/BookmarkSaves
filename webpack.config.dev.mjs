@@ -12,23 +12,11 @@ export default merge(common, {
       firefox:
         "/home/diogo-vitorino/Work/Apps/firefox-129.0b9/firefox/firefox-bin",
     }),
-  ],  
+  ],
   module: {
     rules: [
       {
         test: /\.css$/i,
-        include: /\.module\.css$/,
-        use: [
-          { loader: "style-loader" },
-          {
-            loader: "css-loader",
-            options: { importLoaders: 1, modules: true },
-          },
-        ],
-      },
-      {
-        test: /\.css$/i,
-        exclude: /\.module\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }],
       },
     ],

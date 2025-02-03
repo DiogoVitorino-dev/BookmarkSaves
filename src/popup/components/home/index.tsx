@@ -1,30 +1,17 @@
-import React, { lazy, Suspense } from "react";
+import React from "react";
 import * as styles from "./styles.module.css";
 import DarkMode from "./darkMode";
 import TextInput from "@components/shared/input";
-import { useBookmark } from "@contexts/bookmark";
-import { AvailableProps } from "./available";
 import Strings from "@constants/Strings";
 import { useSearch } from "@contexts/search";
+import Search from "./search";
 
-export type HomeProps = Pick<AvailableProps, "onClickSelection">;
-
-const Available = lazy(() => import("./available"));
-const Search = lazy(() => import("./search"));
-
-export default function Home({ onClickSelection }: HomeProps) {
-  const { source } = useBookmark();
+export default function Home() {
   const { setBreakpoint, breakpoint } = useSearch();
 
   return (
     <div className={styles.container}>
-      <Suspense>
-        {source ? (
-          <Available onClickSelection={onClickSelection} />
-        ) : (
-          <Search />
-        )}
-      </Suspense>
+      <Search />
 
       <TextInput
         title={Strings.breakpointTitle}

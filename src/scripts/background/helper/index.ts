@@ -6,11 +6,11 @@ import { MessageAPI } from "@api/message";
 
 export async function PrepareHelper(port: Port) {
   const protocol = port.name.split("/")[1];
-  const { name, server } = Configuration.NativeMessage.helper;
+  const { name, server, skipStartup } = Configuration.NativeMessage.helper;
   const { send } = MessageAPI;
 
   try {
-    if (await WebSocketApp.server.start(name)) {
+    if (skipStartup || (await WebSocketApp.server.start(name))) {
       const socket = await WebSocketApp.client(server, protocol);
 
       port.onMessage.addListener((message) =>

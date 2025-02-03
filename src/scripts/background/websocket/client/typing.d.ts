@@ -43,7 +43,6 @@ export namespace WebSocketClient {
   export interface disconnectInfo {
     code?: number;
     reason?: string;
-    done?: boolean;
   }
 
   export type disconnect = (info?: disconnectInfo) => void;

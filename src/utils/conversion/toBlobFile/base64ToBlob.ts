@@ -1,4 +1,4 @@
-export function base64ToBlob(data: string, type = "") {
+export function base64ToBlob(data: string, type:string) {
   const binary = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
   return new Blob([binary], { type });
 }

@@ -1,4 +1,4 @@
-import { CookiesAPI } from "@api/cookies";
+import { BrowserAPI } from "@api/browser";
 import { HelperVideoSetCookiesParams } from "@background/helper/validation";
 import { WebSocketClient } from "@background/websocket/client/typing";
 
@@ -6,9 +6,9 @@ export async function sendCookies(
   { sendRequest }: WebSocketClient.Socket,
   { url, options }: HelperVideoSetCookiesParams
 ) {
-  const { getAll, disconnect } = CookiesAPI();
+  const { getAllCookies, disconnect } = BrowserAPI();
 
-  const cookies = await getAll({
+  const cookies = await getAllCookies({
     url: new URL(url).origin,
     ...options,
   });

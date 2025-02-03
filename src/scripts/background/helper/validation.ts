@@ -1,6 +1,6 @@
-import { CookiesValidation } from "@background/cookies/validation";
+import { BrowserValidation } from "@background/browser/validation";
 import { MediaQualityOptions } from "@scripts/typing";
-import { InferType, mixed, object, string } from "yup";
+import { array, InferType, lazy, mixed, object, string } from "yup";
 
 const cookies = mixed<Cookies>().test({
   name: "CookieTest",
@@ -16,15 +16,24 @@ const cookies = mixed<Cookies>().test({
 export type HelperVideoSetCookiesParams = InferType<typeof setVideoCookies>;
 const setVideoCookies = object({
   url: string().required(),
-  options: CookiesValidation.getAll,
+  options: BrowserValidation.getAllCookies,
+});
+
+export type HelperVideoDownload = InferType<typeof video>;
+const video = object({
+  url: string().url().trim().required(),
+  quality: mixed<MediaQualityOptions>().optional(),
+  title: string().optional(),
 });
 
 export type HelperVideoDownloadParams = InferType<typeof videoDownload>;
 const videoDownload = object({
-  url: string().url().trim().required(),
-  quality: mixed<MediaQualityOptions>().optional(),
-  title: string().optional(),
-  cookies: cookies.optional(),
+  items: lazy((val) =>
+    Array.isArray(val) ? array().of(video).required() : video.required()
+  ),
+  cookie: lazy((val) =>
+    typeof val === "string" ? string() : cookies
+  ),
 });
 
 export const HelperValidation = {

@@ -29,10 +29,9 @@ export async function generate({
 
     const compressed: BlobFile = {
       name: compressOptions?.filename || defaultFilename(),
+      type: "zip",
       data: await zip.generateAsync({ type: "blob" }),
     };
-
-    compressed.name += ".zip";
 
     return compressed;
   }

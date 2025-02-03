@@ -6,6 +6,7 @@ export default {
     helper: {
       name: "bookmarkSavesHelper",
       server: "ws://localhost:8766",
+      skipStartup: false,
       protocols: {
         video: "video",
       },

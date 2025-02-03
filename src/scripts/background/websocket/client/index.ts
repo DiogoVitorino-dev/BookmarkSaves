@@ -53,9 +53,8 @@ export const client: Client = (url, protocols) =>
       if (connection.readyState !== connection.OPEN) await reconnect();
     };
 
-    const disconnect: WebSocketClient.disconnect = (info) => {
-      if (info?.done) connection.close(1000, "done");
-      else connection.close(info?.code, info?.reason);
+    const disconnect: WebSocketClient.disconnect = (info) => {      
+      connection.close(info?.code, info?.reason);
     };
 
     const onOpen: WebSocketClient.onOpen = (callback) => {

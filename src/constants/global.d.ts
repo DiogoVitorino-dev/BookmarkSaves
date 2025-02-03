@@ -10,6 +10,7 @@ type Cookies = browser.cookies.Cookie[];
 
 interface AppFile<Data> {
   name: string;
+  type: string;
   data: Data;
 }
 
@@ -22,12 +23,14 @@ declare module "*.css";
 declare module "custom-global" {
   global {
     interface Window {
-      __content: ContentWindow;
+      __content__: ContentWindow;
     }
   }
 }
 
 interface ContentWindow {
-  searching: Set<string>;
-  searchResult: import("@content/typing").Bookmark | null;
+  searching: boolean;
+  videos: string[];
 }
+
+type Tab = Required<Pick<browser.tabs.Tab, "url" | "id">> & browser.tabs.Tab;

@@ -6,14 +6,14 @@ import { HelperVideoDownloadParams } from "@background/helper/validation";
 
 export interface VideoInformation {
   title: string;
-  format: string;
   url: string;
+  type: string;
   width: number;
   height: number;
 }
 
 export interface EncodedVideo extends VideoInformation {
-  encodedData: DataUrlFile;
+  encodedData: BlobFile;
 }
 
 const qualities: MediaQuality<string> = {
@@ -30,20 +30,28 @@ const qualities: MediaQuality<string> = {
 };
 
 export async function request(
-  { sendRequest, onMessage, disconnect }: WebSocketClient.Socket,
-  { url, quality, title, cookies }: HelperVideoDownloadParams
-): Promise<EncodedVideo | null> {
-  sendRequest({
-    action: "download",
-    payload: { url, title, quality: qualities[quality || "best"], cookies },
-  });
+  { sendRequest, onMessage, disconnect, connection }: WebSocketClient.Socket,
+  { cookie, items }: HelperVideoDownloadParams
+): Promise<EncodedVideo[]> {
+  if (!Array.isArray(items)) items = [items];
+
+  connection.binaryType = "arraybuffer";
+
+  const videos = items.map((item) => ({
+    ...item,
+    quality: qualities[item.quality || "best"],
+  }));
+
+  sendRequest({ action: "download", payload: { items: videos, cookie } });
+
+  const result: EncodedVideo[] = [];
 
   try {
-    const video = await receivingData(onMessage);
-    return video;
+    result.push(...(await receivingData(items, onMessage)));
   } catch (error) {
     console.error("Erro ao processar mensagem:", error);
-    disconnect({ done: true });
+    disconnect();
   }
-  return null;
+
+  return result;
 }

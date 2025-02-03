@@ -1,65 +1,100 @@
 import { WebSocketClient } from "@background/websocket/client/typing";
 import { EncodedVideo, VideoInformation } from "./request";
-import { ConversionUtils } from "@utils/conversion";
+import { HelperVideoDownload } from "@background/helper/validation";
 
-type DownloadStarted = { download: "started" };
+type ResponseStatus = "starting" | "downloaded" | "sending" | "completed";
 
-interface DownloadSending extends VideoInformation {
-  download: "sending";
-}
+type Response<Status extends ResponseStatus, Payload> = {
+  status: Status;
+  response: Payload;
+};
 
-interface DownloadVideoChunks {
-  index: number;
-  chunk: string;
-}
+type AllResponse =
+  | Response<"starting", string>
+  | Response<"sending", string>
+  | Response<"completed", string>
+  | Response<"downloaded", VideoInformation>;
 
-type DownloadCompleted = { download: "done" };
+export const receivingData = (
+  requestedVideos: HelperVideoDownload[],
+  onMessage: WebSocketClient.onMessage
+) =>
+  new Promise<EncodedVideo[]>((resolve) => {
+    let current = "";
+    let info: VideoInformation | null = null;
+    let chunks: Uint8Array[] = [];
 
-type ReceiveMessages =
-  | DownloadStarted
-  | DownloadSending
-  | DownloadVideoChunks
-  | DownloadCompleted;
+    let video: EncodedVideo;
+    const result: EncodedVideo[] = [];
 
-export const receivingData = (onMessage: WebSocketClient.onMessage) =>
-  new Promise<EncodedVideo>((resolve, reject) => {
-    const data: Uint8Array[] = [];
-    let info: VideoInformation;
+    onMessage(handleResponse);
 
-    onMessage((event) => {
-      const message: ReceiveMessages = JSON.parse(event.data);
+    function handleResponse(event: MessageEvent) {
+      console.log(event.data);
+      try {
+        if (event.data instanceof ArrayBuffer) {
+          chunks.push(new Uint8Array(event.data));
+        } else {
+          const message: AllResponse = JSON.parse(event.data);
 
-      if ("download" in message === false) {
-        data[message.index] = Uint8Array.from(atob(message.chunk), (c) =>
-          c.charCodeAt(0)
-        );
-      } else {
-        switch (message.download) {
-          case "started":
-            console.log("Requesting video");
-            break;
+          switch (message.status) {
+            case "starting":
+              current = message.response;
+              break;
+            case "downloaded":
+              info = message.response;
+              break;
+            case "completed":
+              if (info && chunks.length) {
+                video = {
+                  ...info,
+                  encodedData: {
+                    name: info.title,
+                    type: info.type,
+                    data: new Blob(chunks, { type: info.type }),
+                  },
+                };
+                result.push(video);
+                isAllCompleted(video);
+              } else {
+                failed(current, info, chunks);
+              }
 
-          case "sending":
-            info = {
-              width: message.width,
-              height: message.height,
-              format: message.format || "mp4",
-              title: message.title,
-              url: message.url,
-            };
-            break;
-
-          case "done": {
-            console.log("Video received!");
-            const blob = new Blob(data, { type: `video/${info.format}` });
-
-            ConversionUtils.toDataUrlFile
-              .fromBlob(blob, info.title)
-              .then((encodedData) => resolve({ ...info, encodedData }))
-              .catch((reason) => reject(reason));
-            break;
+              chunks = [];
+              info = null;
+              current = "";
+              break;
           }
         }
+      } catch (error) {
+        console.error(error);
+        failed(current, info, chunks);
       }
-    });
+    }
+
+    function isAllCompleted(lastReceived: EncodedVideo) {
+      requestedVideos = requestedVideos.filter(
+        (item) => item.url !== lastReceived.url
+      );
+
+      if (requestedVideos.length === 0) resolve(result);
+    }
+
+    function failed(
+      expectedVideo: string,
+      infoReceived?: Partial<VideoInformation> | null,
+      chunksReceived?: Uint8Array[]
+    ) {
+      requestedVideos = requestedVideos.filter(
+        (item) => item.url !== expectedVideo
+      );
+
+      console.error(
+        `Error ao baixar o video: ${expectedVideo} |Received:`,
+        infoReceived,
+        chunksReceived
+      );
+
+      if (requestedVideos.length === 0) resolve(result);
+    }
   });

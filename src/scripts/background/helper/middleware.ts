@@ -42,7 +42,7 @@ export async function HelperMiddleware(
         break;
 
       case HelperServerActions.close:
-        socket.disconnect({ done: true });
+        socket.disconnect();
         sendResponse(port, { action, result: true });
         break;
 
@@ -51,12 +51,12 @@ export async function HelperMiddleware(
           action: action || "",
           result: MiddlewareErrors.actionDoesNotExist,
         });
-        socket.disconnect({ done: true });
+        socket.disconnect();
         break;
     }
   } catch (error) {
     console.log(error);
-    socket.disconnect({ done: true });
+    socket.disconnect();
 
     if (error instanceof ValidationError) {
       sendResponse(port, {

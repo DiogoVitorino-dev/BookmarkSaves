@@ -4,7 +4,7 @@ import { Message } from "@api/message/typing";
 import { XSearchActions, XSearch } from "./search";
 import { XValidation } from "./validation";
 
-window.__content = { searching: new Set(""), searchResult: null };
+window.__content__ = { searching: false, videos: [] };
 
 async function XMiddleware(
   { action, payload }: Partial<Message.Request>,
@@ -20,27 +20,6 @@ async function XMiddleware(
           result: await XSearch.start(
             await XValidation.startSearch.validate(payload)
           ),
-        });
-        break;
-
-      case XSearchActions.cancel:
-        sendResponse(port, {
-          action,
-          result: XSearch.cancel(),
-        });
-        break;
-
-      case XSearchActions.isRunning:
-        sendResponse(port, {
-          action,
-          result: XSearch.IsRunning(),
-        });
-        break;
-
-      case XSearchActions.waitForResult:
-        sendResponse(port, {
-          action,
-          result: await XSearch.waitForResult(),
         });
         break;
     }

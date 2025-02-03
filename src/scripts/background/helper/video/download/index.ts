@@ -7,7 +7,7 @@ export async function download(
   socket: WebSocketClient.Socket,
   params: HelperVideoDownloadParams
 ) {
-  HelperUtils.disconnectOnError(socket);
+  HelperUtils.disconnectOnError(socket); 
 
   return request(socket, params);
 }

@@ -7,14 +7,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useBookmark } from "@contexts/bookmark";
 import { InstagramAPI } from "@api/instagram";
-import { MessageAPI } from "@api/message";
 import { useDebounce } from "@hooks/useDebounce";
 import { UrlUtils } from "@utils/url";
 import { InstagramRepository } from "@repository/instagram";
 import { X_API } from "@api/x";
 import { XRepository } from "@repository/x";
+import { BrowserAPI } from "@api/browser";
+import { ToolsAPI } from "@api/tools";
 
 export interface SearchContext {
   available: boolean;
@@ -53,34 +53,27 @@ export default function SearchProvider({ children }: ProviderProps) {
   const [available, setAvailable] = useState(false);
   const debounceBreakpoint = useDebounce(breakpoint);
 
-  const { setBookmark } = useBookmark();
-
   const url = useRef<string>("");
 
   const search = useCallback(async () => {
     setSearching(true);
 
-    let bookmark = null;
-
-    if (UrlUtils.match(url.current, "instagram")) {
-      bookmark = await InstagramAPI().search(breakpoint);
-    } else if (UrlUtils.match(url.current, "x")) {
-      bookmark = await X_API().search(breakpoint);
+    switch (UrlUtils.match(url.current)) {
+      case "instagram":
+        await InstagramAPI().search(breakpoint);
+        break;
+      case "x":
+        await X_API().search(breakpoint);
+        break;
     }
-
-    if (bookmark) setBookmark(bookmark);
 
     setSearching(false);
-  }, [breakpoint, setBookmark]);
+  }, [breakpoint]);
 
-  const cancel = useCallback(() => {
+  const cancel = useCallback(async () => {
     if (searching) setSearching(false);
 
-    if (UrlUtils.match(url.current, "instagram")) {
-      InstagramAPI().cancel();
-    } else if (UrlUtils.match(url.current, "x")) {
-      X_API().cancel();
-    }
+    await ToolsAPI().cancelSearch();
   }, [searching]);
 
   const handleSetBreakpoint = useCallback((newValue: string) => {
@@ -88,44 +81,32 @@ export default function SearchProvider({ children }: ProviderProps) {
   }, []);
 
   const checkSearchAvailability = () => {
-    if (
-      UrlUtils.match(url.current, "instagram") ||
-      UrlUtils.match(url.current, "x")
-    ) {
-      setAvailable(true);
-    }
+    if (UrlUtils.match(url.current)) setAvailable(true);
   };
 
   const getSavedBreakpoint = async () => {
-    if (UrlUtils.match(url.current, "instagram")) {
-      setBreakpoint(await InstagramRepository().getBreakpoint(url.current));
-    } else if (UrlUtils.match(url.current, "x")) {
-      setBreakpoint(await XRepository().getBreakpoint());
+    switch (UrlUtils.match(url.current)) {
+      case "instagram":
+        setBreakpoint(await InstagramRepository().getBreakpoint(url.current));
+        break;
+
+      case "x":
+        setBreakpoint(await XRepository().getBreakpoint());
+        break;
     }
   };
 
   const isSearching = useCallback(async () => {
-    let bookmark = null;
-
-    if (UrlUtils.match(url.current, "instagram")) {
-      const isRunning = await InstagramAPI().isSearchRunning();
-      if (isRunning) {
-        setSearching(true);
-        bookmark = await InstagramAPI().waitForSearchResult();
-      }
-    } else if (UrlUtils.match(url.current, "x")) {
-      const isRunning = await X_API().isSearchRunning();
-      if (isRunning) {
-        setSearching(true);
-        bookmark = await X_API().waitForSearchResult();
-      }
+    if (await ToolsAPI().isSearching()) {
+      setSearching(true);
+      ToolsAPI()
+        .waitForSearch()
+        .finally(() => setSearching(false));
     }
-
-    if (bookmark) await setBookmark(bookmark);
-  }, [setBookmark]);
+  }, []);
 
   const init = useCallback(async () => {
-    const tab = await MessageAPI.findCurrentTab();
+    const tab = await BrowserAPI().findCurrentTab();
 
     if (tab) {
       url.current = tab.url;
@@ -142,10 +123,14 @@ export default function SearchProvider({ children }: ProviderProps) {
   }, [isSearching, init]);
 
   useEffect(() => {
-    if (UrlUtils.match(url.current, "instagram")) {
-      InstagramRepository().saveBreakpoint(url.current, debounceBreakpoint);
-    } else if (UrlUtils.match(url.current, "x")) {
-      XRepository().saveBreakpoint(debounceBreakpoint);
+    switch (UrlUtils.match(url.current)) {
+      case "instagram":
+        InstagramRepository().saveBreakpoint(url.current, debounceBreakpoint);
+        break;
+
+      case "x":
+        XRepository().saveBreakpoint(debounceBreakpoint);
+        break;
     }
   }, [debounceBreakpoint]);
 

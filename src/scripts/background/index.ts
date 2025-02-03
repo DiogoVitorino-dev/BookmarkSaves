@@ -1,4 +1,4 @@
-import { CookiesMiddleware } from "./cookies";
+import { BrowserMiddleware } from "./browser";
 import { PrepareHelper } from "./helper";
 import { StorageMiddleware } from "./storage";
 
@@ -8,8 +8,8 @@ async function handleConnect(port: Port) {
       port.onMessage.addListener((message) => StorageMiddleware(message, port));
       break;
 
-    case "cookies":
-      port.onMessage.addListener((message) => CookiesMiddleware(message, port));
+    case "browser":
+      port.onMessage.addListener((message) => BrowserMiddleware(message, port));
       break;
 
     case "helper/video": {

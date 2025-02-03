@@ -4,12 +4,12 @@ export function save(file: BlobFile[] | BlobFile) {
   let url;
   let link: HTMLAnchorElement;
 
-  file.forEach(({ data, name }) => {
+  file.forEach(({ data, name, type }) => {
     url = URL.createObjectURL(data);
 
     link = document.createElement("a");
     link.href = url;
-    link.download = name;
+    link.download = `${name}.${type}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

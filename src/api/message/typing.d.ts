@@ -12,4 +12,4 @@ export namespace Message {
   }
 }
 
-export type Tab = Required<Pick<browser.tabs.Tab, "url" | "id">> & browser.tabs.Tab;
+

@@ -1,8 +1,9 @@
 import { MediaType } from "@content/common";
 import { Media } from "@content/typing";
+import { MediaRepository } from "@repository/media";
 import { ConversionUtils } from "@utils/conversion";
 
-export enum ImageQuality {
+enum ImageQuality {
   "best" = "4096x4096",
   "2048p" = "large",
   "1200p" = "medium",
@@ -11,24 +12,21 @@ export enum ImageQuality {
   "worst" = "360x360",
 }
 
-export type ImageQualityList = keyof typeof ImageQuality;
-
-export async function createImageMedia<T extends HTMLElement | string>(
+export async function getImage<T extends HTMLElement | string>(
   source: T,
-  quality: ImageQualityList = "best"
+  url: string
 ): Promise<Media | null> {
   let media: Media | null = null;
 
   // from url
-  if (typeof source === "string")
-    return createImage(source, ImageQuality[quality]);
+  if (typeof source === "string") return fetchImage(source, url);
 
   // from element
   const imgs = source.getElementsByTagName("img");
 
   for await (const img of imgs) {
     if (img.src.match(/\/pbs.twimg.com\/media\//)) {
-      media = await createImage(img.src, ImageQuality[quality]);
+      media = await fetchImage(img.src, url);
       break;
     }
   }
@@ -36,22 +34,31 @@ export async function createImageMedia<T extends HTMLElement | string>(
   return media;
 }
 
-async function createImage(source: string, quality: ImageQuality) {
-  const url = applyingQuality(source, quality);
-  const dataUrl = await ConversionUtils.toDataUrlFile.fromUrl(url);
+async function fetchImage(src: string, url: string): Promise<Media | null> {
+  const { getSavedMedia, saveMedia } = MediaRepository();
+  let media: Media | null = null;
 
-  if (dataUrl) {
-    const { width, height } = await getImageMeta(url);
-    return {
+  src = applyingQuality(src, ImageQuality.best);
+
+  media = await getSavedMedia(src);
+  if (media) return media;
+
+  const file = await ConversionUtils.toBlobFile.fromUrl(src);
+
+  if (file) {
+    const { width, height } = await getImageMeta(src);
+    media = {
       type: MediaType.Image,
       width,
       height,
       url,
-      extra: { dataUrl },
+      file,
     };
+    
+    await saveMedia(src, media);
   }
 
-  return null;
+  return media;
 }
 
 function getImageMeta(src: string) {

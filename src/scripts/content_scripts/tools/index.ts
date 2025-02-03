@@ -4,6 +4,7 @@ import { DownloadTools, DownloadToolsActions } from "./download";
 import { CompressTools, CompressToolsActions } from "./compress";
 import { ToolsValidation } from "./validation";
 import { Message } from "@api/message/typing";
+import { SearchTools, SearchToolsActions } from "./search";
 
 async function ToolsMiddleware(
   { action, payload }: Partial<Message.Request>,
@@ -28,6 +29,27 @@ async function ToolsMiddleware(
           result: await CompressTools.generate(
             await ToolsValidation.generateCompress.validate(payload)
           ),
+        });
+        break;
+
+      case SearchToolsActions.waitForResult:
+        sendResponse(port, {
+          action,
+          result: await SearchTools.waitForResult(),
+        });
+        break;
+
+      case SearchToolsActions.isSearching:
+        sendResponse(port, {
+          action,
+          result: SearchTools.isSearching(),
+        });
+        break;
+
+      case SearchToolsActions.cancel:
+        sendResponse(port, {
+          action,
+          result: SearchTools.cancel(),
         });
         break;
     }

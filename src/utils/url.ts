@@ -3,8 +3,13 @@ export const URLMatches = {
   x: /https:\/\/x.com\/i\/bookmarks/,
 };
 
-const match = (url: string, domain: keyof typeof URLMatches) =>
-  url.match(URLMatches[domain]);
+type UrlMatches = keyof typeof URLMatches;
+
+const match = (url: string): UrlMatches | null => {
+  if (url.match(URLMatches.instagram)) return "instagram";
+  if (url.match(URLMatches.x)) return "x";
+  return null;
+};
 
 export const UrlUtils = {
   match,

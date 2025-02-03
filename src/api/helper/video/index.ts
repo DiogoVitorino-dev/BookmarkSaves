@@ -12,7 +12,7 @@ export function VideoHelperAPI(port: Port) {
   async function downloadVideo(params: HelperVideoDownloadParams) {
     const request = await sendRequest<
       HelperVideoDownloadParams,
-      EncodedVideo | null
+      EncodedVideo[]
     >(port, {
       action: VideoHelperActions.download,
       payload: params,
