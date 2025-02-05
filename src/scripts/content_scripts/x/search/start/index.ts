@@ -2,7 +2,6 @@ import { XStartSearchParams } from "@content/x/validation";
 
 import { search } from "./search";
 import { DownloadTools } from "@content/tools/download";
-import { downloadVideos } from "./videos/download";
 
 export async function start(
   breakpoint: XStartSearchParams = ""
@@ -11,8 +10,6 @@ export async function start(
     window.__content__.searching = true;
 
     const medias = await search(breakpoint);
-
-    medias.push(...(await downloadVideos()))
 
     await DownloadTools.start({ blobFiles: medias, compress: true });
   } catch (error) {

@@ -1,6 +1,3 @@
-import { MediaType } from "@content/common";
-import { Media } from "@content/typing";
-import { MediaRepository } from "@repository/media";
 import { ConversionUtils } from "@utils/conversion";
 
 enum ImageQuality {
@@ -12,53 +9,40 @@ enum ImageQuality {
   "worst" = "360x360",
 }
 
-export async function getImage<T extends HTMLElement | string>(
-  source: T,
-  url: string
-): Promise<Media | null> {
-  let media: Media | null = null;
-
+export async function getImage<T extends Element | string>(
+  source: T
+): Promise<Media<BlobFile> | null> {
   // from url
-  if (typeof source === "string") return fetchImage(source, url);
+  if (typeof source === "string") return fetchImage(source);
 
   // from element
   const imgs = source.getElementsByTagName("img");
 
   for await (const img of imgs) {
     if (img.src.match(/\/pbs.twimg.com\/media\//)) {
-      media = await fetchImage(img.src, url);
-      break;
+      return fetchImage(img.src);
     }
   }
 
-  return media;
+  return null
 }
 
-async function fetchImage(src: string, url: string): Promise<Media | null> {
-  const { getSavedMedia, saveMedia } = MediaRepository();
-  let media: Media | null = null;
-
+async function fetchImage(src: string): Promise<Media<BlobFile> | null> {
   src = applyingQuality(src, ImageQuality.best);
-
-  media = await getSavedMedia(src);
-  if (media) return media;
 
   const file = await ConversionUtils.toBlobFile.fromUrl(src);
 
   if (file) {
     const { width, height } = await getImageMeta(src);
-    media = {
-      type: MediaType.Image,
+    return {
+      type: "image",
       width,
       height,
-      url,
       file,
     };
-    
-    await saveMedia(src, media);
   }
 
-  return media;
+  return null;
 }
 
 function getImageMeta(src: string) {

@@ -30,9 +30,9 @@ const qualities: MediaQuality<string> = {
 };
 
 export async function request(
-  { sendRequest, onMessage, disconnect, connection }: WebSocketClient.Socket,
+  { sendRequest, onMessage, connection }: WebSocketClient.Socket,
   { cookie, items }: HelperVideoDownloadParams
-): Promise<EncodedVideo[]> {
+): Promise<Map<string, EncodedVideo[]>> {
   if (!Array.isArray(items)) items = [items];
 
   connection.binaryType = "arraybuffer";
@@ -44,14 +44,5 @@ export async function request(
 
   sendRequest({ action: "download", payload: { items: videos, cookie } });
 
-  const result: EncodedVideo[] = [];
-
-  try {
-    result.push(...(await receivingData(items, onMessage)));
-  } catch (error) {
-    console.error("Erro ao processar mensagem:", error);
-    disconnect();
-  }
-
-  return result;
+  return receivingData(items, onMessage);
 }

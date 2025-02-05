@@ -1,27 +1,44 @@
-import { Media } from "@content/typing";
 import { XPost } from "@content/x/typing";
 import { getImage } from "../media/image";
 import { getVideo } from "../media/video";
+import { CollectionRepository } from "@repository/collection";
+import { HelperApiContexts } from "@api/helper/typing";
 
-export async function fetchMedia(element: XPost): Promise<Media[]> {
-  let media: Media | null = null;
-  const result: Media[] = [];
+export async function fetchMedia(
+  element: XPost,
+  source: string,
+  helper: HelperApiContexts["video"]
+): Promise<Collection | null> {
+  const { get, save } = CollectionRepository();
 
-  const anchors = element.getElementsByTagName("a");
+  let result: Collection | null = null
 
-  for await (const a of anchors) {
+  if (result) {
+    return result;
+  } else {
+    result = {
+      source,
+      medias: [],
+    };
+  }
+  let media: Media<BlobFile> | null = null;
+
+  const items = element.querySelectorAll('div[data-testid="tweetPhoto"]');
+
+  for await (const div of items) {
     // image
-    if (a.href.match(/\/status\/[^/]+\/photo\/[^/]/)) {
-      media = await getImage(a, a.href);
-
-      if (media) result.push(media);
-    }
-
-    // video
-    if (a.href.match(/\/status\//) && !a.href.match(/analytics|photo/)) {
-      result.push(...(await getVideo(element, a.href)));
-    }
+    media = await getImage(div);
+    if (media) result.medias = [...result.medias, media];
   }
 
+  // video
+  result.medias = [
+    ...result.medias,
+    ...(await getVideo(element, source, helper)),
+  ];
+  
+  if (!result.medias.length) return null;
+
+  await save(result);
   return result;
 }

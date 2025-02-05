@@ -1,6 +1,6 @@
 import { ValidatedVideo } from "../validation";
-import { MediaType } from "@content/common";
-import { Media } from "@content/typing";
+
+
 import { ContentUtils } from "@content/utils";
 import { MediaQualityOptions } from "@scripts/typing";
 

@@ -1,6 +1,6 @@
 import { ValidatedImage } from "../validation";
-import { MediaType } from "@content/common";
-import { Media } from "@content/typing";
+
+
 import { ConversionUtils } from "@utils/conversion";
 import { ContentUtils } from "@content/utils";
 import { MediaQualityOptions } from "@scripts/typing";

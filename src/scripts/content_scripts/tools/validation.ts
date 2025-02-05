@@ -10,6 +10,7 @@ import {
 
 const blobFile: ObjectSchema<BlobFile> = object({
   name: string().required(),
+  type: string().required(),
   data: mixed<Blob>()
     .required()
     .test(
@@ -21,11 +22,13 @@ const blobFile: ObjectSchema<BlobFile> = object({
 
 const dataUrlFile: ObjectSchema<DataUrlFile> = object({
   name: string().required(),
+  type: string().required(),
   data: string().required(),
 });
 
 const base64File: ObjectSchema<Base64File> = object({
   name: string().required(),
+  type: string().required(),
   data: string().required(),
 });
 

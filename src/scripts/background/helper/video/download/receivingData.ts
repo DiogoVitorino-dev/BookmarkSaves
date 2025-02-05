@@ -2,30 +2,47 @@ import { WebSocketClient } from "@background/websocket/client/typing";
 import { EncodedVideo, VideoInformation } from "./request";
 import { HelperVideoDownload } from "@background/helper/validation";
 
-type ResponseStatus = "starting" | "downloaded" | "sending" | "completed";
+type ResponseStatus =
+  | "starting"
+  | "downloaded"
+  | "transmitting"
+  | "completed"
+  | "finalized"
+  | "error";
 
 type Response<Status extends ResponseStatus, Payload> = {
   status: Status;
   response: Payload;
 };
 
+interface DownloadedResponse {
+  playlist: {
+    index: number;
+    total: number;
+  };
+  metadata: VideoInformation;
+}
+
 type AllResponse =
   | Response<"starting", string>
-  | Response<"sending", string>
+  | Response<"transmitting", string>
   | Response<"completed", string>
-  | Response<"downloaded", VideoInformation>;
+  | Response<"error", string>
+  | Response<"finalized", string>
+  | Response<"downloaded", DownloadedResponse>;
 
 export const receivingData = (
   requestedVideos: HelperVideoDownload[],
   onMessage: WebSocketClient.onMessage
 ) =>
-  new Promise<EncodedVideo[]>((resolve) => {
+  new Promise<Map<string, EncodedVideo[]>>((resolve) => {
     let current = "";
     let info: VideoInformation | null = null;
     let chunks: Uint8Array[] = [];
 
     let video: EncodedVideo;
-    const result: EncodedVideo[] = [];
+    let videosReceived: EncodedVideo[] = [];
+    const result: Map<string, EncodedVideo[]> = new Map();
 
     onMessage(handleResponse);
 
@@ -42,7 +59,7 @@ export const receivingData = (
               current = message.response;
               break;
             case "downloaded":
-              info = message.response;
+              info = message.response.metadata;
               break;
             case "completed":
               if (info && chunks.length) {
@@ -54,16 +71,26 @@ export const receivingData = (
                     data: new Blob(chunks, { type: info.type }),
                   },
                 };
-                result.push(video);
-                isAllCompleted(video);
-              } else {
-                failed(current, info, chunks);
+                
+                videosReceived.push(video);
               }
 
               chunks = [];
               info = null;
-              current = "";
               break;
+              
+              case "finalized":
+              if (videosReceived.length) {
+                result.set(message.response, videosReceived);
+              }
+              isAllCompleted(message.response);
+              
+              current = "";
+              videosReceived = [];
+              break;
+
+            case "error":
+              throw message.response;
           }
         }
       } catch (error) {
@@ -72,10 +99,8 @@ export const receivingData = (
       }
     }
 
-    function isAllCompleted(lastReceived: EncodedVideo) {
-      requestedVideos = requestedVideos.filter(
-        (item) => item.url !== lastReceived.url
-      );
+    function isAllCompleted(url: string) {
+      requestedVideos = requestedVideos.filter((item) => item.url !== url);
 
       if (requestedVideos.length === 0) resolve(result);
     }

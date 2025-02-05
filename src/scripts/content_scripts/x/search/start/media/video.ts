@@ -1,6 +1,5 @@
-import { MediaType } from "@content/common";
-import { Media } from "@content/typing";
-import { MediaRepository } from "@repository/media";
+import { HelperApiContexts } from "@api/helper/typing";
+import { EncodedVideo } from "@background/helper/video/download/request";
 import { ConversionUtils } from "@utils/conversion";
 
 const matchBySrc = /\/tweet_video\//;
@@ -8,35 +7,45 @@ const matchByPoster = /\/ext_tw_video_thumb\/|\/amplify_video_thumb\//;
 
 export async function getVideo<T extends HTMLElement>(
   element: T,
-  source: string
-) {
-  let media: Media | null = null;
-  const result: Media[] = [];
+  source: string,
+  helper: HelperApiContexts["video"]
+): Promise<Media<BlobFile>[]> {
+  const result: Media<BlobFile>[] = [];
+  let downloaded = false;
   const { toBlobFile } = ConversionUtils;
-  const { getSavedMedia, saveMedia } = MediaRepository();
+
+  let encodedVideos: EncodedVideo[] | undefined = [];
 
   const videos = element.getElementsByTagName("video");
 
   for await (const video of videos) {
     if (video.src.match(matchBySrc)) {
-      media = await getSavedMedia(video.src);
+      const file = await toBlobFile.fromUrl(video.src);
+      file.name += `.${file.type}`; // Fix JSZip
 
-      if (!media) {
-        media = {
-          width: video.width,
-          height: video.height,
-          url: source,
-          type: MediaType.Video,
-          file: await toBlobFile.fromUrl(video.src),
-        };
+      result.push({
+        width: video.width,
+        height: video.height,
+        type: "video",
+        file,
+      });
+    } else if (!downloaded && video.poster.match(matchByPoster)) {
+      encodedVideos = (
+        await helper.downloadVideo({ items: { url: source } })
+      ).get(source);
 
-        await saveMedia(video.src, media);
+      if (encodedVideos) {
+        result.push(
+          ...encodedVideos.map<Media<BlobFile>>((encoded) => ({
+            file: encoded.encodedData,
+            height: encoded.height,
+            width: encoded.width,
+            type: "video",
+          }))
+        );
       }
 
-      result.push(media);
-    } else if (video.poster.match(matchByPoster)) {
-      window.__content__.videos.push(source)
-      console.log(source);
+      downloaded = true;
     }
   }
 

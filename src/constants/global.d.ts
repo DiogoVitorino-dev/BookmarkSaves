@@ -8,16 +8,6 @@ declare type Flatten<Type> = Type extends Array<infer Item> ? Item : Type;
 
 type Cookies = browser.cookies.Cookie[];
 
-interface AppFile<Data> {
-  name: string;
-  type: string;
-  data: Data;
-}
-
-type BlobFile = AppFile<Blob>;
-type DataUrlFile = AppFile<string>;
-type Base64File = AppFile<string>;
-
 declare module "*.css";
 
 declare module "custom-global" {
@@ -34,3 +24,27 @@ interface ContentWindow {
 }
 
 type Tab = Required<Pick<browser.tabs.Tab, "url" | "id">> & browser.tabs.Tab;
+
+interface AppFile<Data> {
+  name: string;
+  type: string;
+  data: Data;
+}
+
+type BlobFile = AppFile<Blob>;
+type DataUrlFile = AppFile<string>;
+type Base64File = AppFile<string>;
+
+interface Collection {
+  source: string;
+  medias: Media<BlobFile>[];
+}
+
+interface Media<MediaFile = BlobFile> {
+  type: MediaType;
+  width: number;
+  height: number;
+  file: MediaFile;
+}
+
+type MediaType = "unknown" | "image" | "video";
