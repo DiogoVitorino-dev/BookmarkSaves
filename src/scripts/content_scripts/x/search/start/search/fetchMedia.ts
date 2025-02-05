@@ -11,7 +11,7 @@ export async function fetchMedia(
 ): Promise<Collection | null> {
   const { get, save } = CollectionRepository();
 
-  let result: Collection | null = null
+  let result: Collection | null = await get(source)
 
   if (result) {
     return result;

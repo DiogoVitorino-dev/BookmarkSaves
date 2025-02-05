@@ -23,8 +23,8 @@ export async function generate({
   if (content.length > 0) {
     const zip = new JSZip();
 
-    content.forEach((file) => {
-      zip.file(file.name, file.data, { base64: true });
+    content.forEach(({ data, name, type }) => {
+      zip.file(`${name}.${type}`, data, { base64: true });
     });
 
     const compressed: BlobFile = {

@@ -56,7 +56,9 @@ export const receivingData = (
 
           switch (message.status) {
             case "starting":
-              current = message.response;
+              if (URL.canParse(message.response)) {
+                current = message.response;
+              }
               break;
             case "downloaded":
               info = message.response.metadata;
@@ -71,20 +73,20 @@ export const receivingData = (
                     data: new Blob(chunks, { type: info.type }),
                   },
                 };
-                
+
                 videosReceived.push(video);
               }
 
               chunks = [];
               info = null;
               break;
-              
-              case "finalized":
+
+            case "finalized":
               if (videosReceived.length) {
                 result.set(message.response, videosReceived);
               }
               isAllCompleted(message.response);
-              
+
               current = "";
               videosReceived = [];
               break;

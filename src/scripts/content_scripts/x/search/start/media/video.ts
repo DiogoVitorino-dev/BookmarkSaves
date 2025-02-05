@@ -21,7 +21,6 @@ export async function getVideo<T extends HTMLElement>(
   for await (const video of videos) {
     if (video.src.match(matchBySrc)) {
       const file = await toBlobFile.fromUrl(video.src);
-      file.name += `.${file.type}`; // Fix JSZip
 
       result.push({
         width: video.width,

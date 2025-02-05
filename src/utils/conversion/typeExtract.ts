@@ -1,6 +1,11 @@
 function fromBlob(dataOrType: Blob | string) {
-  if (typeof dataOrType === "string") return dataOrType.split("/")[1];
-  return dataOrType.type.split("/")[1];
+  function getType(type: string) {
+    const result = type.split("/");
+    if (result.length > 1) return result[1];
+    return result[0];
+  }
+  if (typeof dataOrType === "string") return getType(dataOrType);
+  return getType(dataOrType.type);
 }
 
 function fromDataUrl(data: string) {
