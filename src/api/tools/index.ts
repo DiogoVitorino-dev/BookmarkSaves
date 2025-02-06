@@ -61,9 +61,7 @@ export function ToolsAPI() {
   async function cancelSearch() {
     if (!(await lazyConnect("tools", connection))) return null;
 
-    return (
-      await sendRequest(connection, { action: SearchToolsActions.cancel })
-    ).result;
+    await sendRequest(connection, { action: SearchToolsActions.cancel });
   }
 
   return {

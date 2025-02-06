@@ -37,7 +37,7 @@
     },
     {
       "matches": ["https://x.com/i/bookmarks"],
-      "js": ["browser-polyfill.min.js", "x.js"]
+      "js": ["browser-polyfill.min.js", "x.js", "tools.js"]
     }
   ],
 

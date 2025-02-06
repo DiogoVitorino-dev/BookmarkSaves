@@ -2,15 +2,16 @@ import { ContentUtils } from "@content/utils";
 import { XUtils } from "@content/x/utils";
 import { fetchMedia } from "./fetchMedia";
 import { TimeUtils } from "@utils/time";
-import { HelperAPI } from "@api/helper";
 import Configuration from "@constants/Configuration";
+import { HelperApiContexts } from "@api/helper/typing";
 
-export async function search(breaking: string = ""): Promise<BlobFile[]> {
+export async function search(
+  breaking: string = "",
+  helper: HelperApiContexts["video"]
+): Promise<BlobFile[]> {
   const { scroll } = ContentUtils.action;
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
-
-  const helper = await HelperAPI("video");
 
   await TimeUtils.sleep(1500);
 
@@ -27,9 +28,9 @@ export async function search(breaking: string = ""): Promise<BlobFile[]> {
   let collection: Collection | null = null;
 
   while (true) {
-    if (!window.__content__.searching) throw new Error("Search canceled");
-
     for await (const item of XUtils.bookmark.getPosts()) {
+      if (!window.__content__.searching) throw new Error("Search canceled");
+
       url = XUtils.post.findURL(item);
 
       if (!url || done.has(url)) continue;
@@ -52,7 +53,6 @@ export async function search(breaking: string = ""): Promise<BlobFile[]> {
 
     if (scrolling) break;
   }
-  helper.disconnect();
 
   return result;
 }
