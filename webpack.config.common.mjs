@@ -3,19 +3,43 @@ import CopyWebpackPlugin from "copy-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import path from "path";
 
+const paths = {
+  content: "scripts/content_scripts",
+  background: "scripts/background",
+  packages: "packages",
+  popup: "popup",
+};
+
 export default {
   target: "web",
   entry: {
     // Content Scripts
-    instagram: "./src/scripts/content_scripts/instagram/index.ts",
-    x: "./src/scripts/content_scripts/x/index.ts",
-    tools: "./src/scripts/content_scripts/tools/index.ts",
+    instagram: {
+      import: "./src/scripts/content_scripts/instagram/index.ts",
+      filename: paths.content + "/instagram.js",
+    },
+
+    x: {
+      import: "./src/scripts/content_scripts/x/index.ts",
+      filename: paths.content + "/x.js",
+    },
+
+    tools: {
+      import: "./src/scripts/content_scripts/tools/index.ts",
+      filename: paths.content + "/tools.js",
+    },
 
     // Background Scripts
-    background: "./src/scripts/background/index.ts",
+    background: {
+      import: "./src/scripts/background/index.ts",
+      filename: paths.background + "/background.js",
+    },
 
     // Page Scripts
-    script: "./src/popup/index.tsx",
+    script: {
+      import: "./src/popup/index.tsx",
+      filename: `${paths.popup}/script.js`,
+    },
   },
   output: {
     path: path.resolve(import.meta.dirname, "public"),
@@ -25,6 +49,7 @@ export default {
   plugins: [
     new HtmlWebpackPlugin({
       template: "./src/index.html",
+      filename: paths.popup + "/index.html",
       cache: true,
       chunks: ["script"],
     }),
@@ -36,7 +61,7 @@ export default {
         },
         {
           from: path.resolve(import.meta.dirname, "src", "assets"),
-          to: path.resolve("public","assets"),
+          to: path.resolve("public", "assets"),
         },
       ],
     }),
@@ -47,7 +72,7 @@ export default {
             "node_modules",
             "webextension-polyfill/dist/browser-polyfill.min.js"
           ),
-          to: ".",
+          to: "./" + paths.packages,
         },
       ],
     }),

@@ -27,24 +27,35 @@
   },
 
   "background": {
-    "scripts": ["browser-polyfill.min.js", "background.js"]
+    "scripts": [
+      "packages/browser-polyfill.min.js",
+      "scripts/background/background.js"
+    ]
   },
 
   "content_scripts": [
     {
       "matches": ["https://www.instagram.com/*/saved/*"],
-      "js": ["browser-polyfill.min.js", "tools.js", "instagram.js"]
+      "js": [
+        "packages/browser-polyfill.min.js",
+        "scripts/content_scripts/tools.js",
+        "scripts/content_scripts/instagram.js"
+      ]
     },
     {
       "matches": ["https://x.com/i/bookmarks"],
-      "js": ["browser-polyfill.min.js", "x.js", "tools.js"]
+      "js": [
+        "packages/browser-polyfill.min.js",
+        "scripts/content_scripts/x.js",
+        "scripts/content_scripts/tools.js"
+      ]
     }
   ],
 
   "action": {
     "default_icon": "assets/icons/bookmark_48.jpg",
     "default_title": "BookmarkSaves",
-    "default_popup": "index.html"
+    "default_popup": "popup/index.html"
   },
 
   "content_security_policy": {
