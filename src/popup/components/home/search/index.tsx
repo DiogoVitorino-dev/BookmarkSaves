@@ -3,7 +3,7 @@ import Video from "@components/shared/video";
 import * as styles from "./styles.module.css";
 import SearchButton from "./button";
 
-const particles = browser.runtime.getURL("./videos/stars.webm");
+const particles = browser.runtime.getURL("./assets/videos/stars.webm");
 
 export default function Search() {
   return (

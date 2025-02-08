@@ -3,11 +3,11 @@ import * as styles from "./styles.module.css";
 import Strings from "@constants/Strings";
 import { useSearch } from "@contexts/search";
 
-const cloud1 = browser.runtime.getURL("./svgs/cloud1.svg");
-const cloud2 = browser.runtime.getURL("./svgs/cloud2.svg");
-const cloud3 = browser.runtime.getURL("./svgs/cloud3.svg");
-const cloud4 = browser.runtime.getURL("./svgs/cloud4.svg");
-const cloud5 = browser.runtime.getURL("./svgs/cloud5.svg");
+const cloud1 = browser.runtime.getURL("./assets/svgs/cloud1.svg");
+const cloud2 = browser.runtime.getURL("./assets/svgs/cloud2.svg");
+const cloud3 = browser.runtime.getURL("./assets/svgs/cloud3.svg");
+const cloud4 = browser.runtime.getURL("./assets/svgs/cloud4.svg");
+const cloud5 = browser.runtime.getURL("./assets/svgs/cloud5.svg");
 
 export default function SearchButton() {
   const buttonRef = useRef<HTMLButtonElement | null>(null);

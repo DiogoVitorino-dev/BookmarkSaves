@@ -36,7 +36,7 @@ export default {
         },
         {
           from: path.resolve(import.meta.dirname, "src", "assets"),
-          to: path.resolve("public"),
+          to: path.resolve("public","assets"),
         },
       ],
     }),

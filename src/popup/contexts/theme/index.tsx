@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import LoadFonts from "./fonts";
 
 export interface ThemeContext {
   theme: ThemeOptions;
@@ -44,7 +45,7 @@ export default function ThemeProvider({ children }: ProviderProps) {
   }, [repository]);
 
   useEffect(() => {
-    getStoredTheme().finally(() => setLoaded(true));
+    Promise.all([getStoredTheme, LoadFonts]).finally(() => setLoaded(true));
   }, [getStoredTheme]);
 
   const value = useMemo<ThemeContext>(

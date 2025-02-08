@@ -6,8 +6,8 @@
   "description": "Baixa imagens, videos e GIFs de bookmarks salvos",
 
   "icons": {
-    "48": "icons/bookmark_48.jpg",
-    "96": "icons/bookmark_96.jpg"
+    "48": "assets/icons/bookmark_48.jpg",
+    "96": "assets/icons/bookmark_96.jpg"
   },
 
   "permissions": [
@@ -42,7 +42,7 @@
   ],
 
   "action": {
-    "default_icon": "icons/bookmark_48.jpg",
+    "default_icon": "assets/icons/bookmark_48.jpg",
     "default_title": "BookmarkSaves",
     "default_popup": "index.html"
   },
