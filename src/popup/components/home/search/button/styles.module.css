@@ -1,140 +1,239 @@
-@keyframes borderRotated {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
-@keyframes hovered {
-  0% {
-    box-shadow: 0px 0px 0px 0px var(--color-inverse-primary);
-  }
-
-  100% {
-    box-shadow: 0px 0px 0px 16px var(--color-inverse-primary);
-  }
-}
-
-@keyframes activated {
-  0% {
-    box-shadow: 0px 0px 0px 16px var(--color-inverse-primary);
-  }
-
-  100% {
-    box-shadow: 0px 0px 0px 8px var(--color-inverse-primary);
-  }
-}
-
-@keyframes cancelIlluminating {
-  0% {
-    filter: drop-shadow(0px 0px 2px var(--color-error));
-  }
-
-  50% {
-    filter: drop-shadow(0px 0px 12px var(--color-error));
-  }
-  
-  100% {
-    filter: drop-shadow(0px 0px 2px var(--color-error));
-  }
-}
-
 .button {
-  display: flex;
-  width: 90px;
-  height: 90px;
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
+  --sky-start: #030626;
+  --sky-middle: #3c1e77;
+  --sky-end: #6767e1;
+
+  --cloud1: #fdfbff;
+  --cloud2: #9d90f1;
+  --cloud3: #cb53bc;
+  --cloud4: #292fa6;
+  --cloud5: #17176d;
+
+  width: 100px;
+  height: 100px;
+  background: transparent;
   position: relative;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   border-radius: 50%;
-  overflow: hidden;
-  filter: drop-shadow(
-    1px 1px 5px color-mix(in srgb, var(--color-shadow) 10%, transparent)
-  );
-  transition: 500ms;
+  padding: 2px;
 }
 
 .button:hover {
   cursor: pointer;
-  transform: scale(1.05);
-}
-
-.button:active {
-  transform: scale(0.95);
 }
 
 .button:disabled {
-  /*filter: grayscale(70%) brightness(70%);*/
+  filter: saturate(0%);
   opacity: 0.7;
-  cursor: default;
 }
 
-.available:hover {
-  animation-duration: 500ms;
-  animation-name: hovered;
-  transition-timing-function: linear;
-  animation-fill-mode: forwards;
+/* control */
+
+.idle > .sky > .cloud {
+  bottom: -50%;
 }
 
-.available:active {
-  animation-duration: 300ms;
-  animation-name: activated;
-  transition-timing-function: linear;
-  animation-fill-mode: forwards;
+.idle::before {
+  opacity: 0;
 }
 
-.border {
-  width: 100%;
-  height: 100%;
+.button:not(.idle):hover > .sky > .cloud {
+  bottom: 0%;
+  rotate: 0deg;
+}
+
+.button:not(.idle) > .sky > .title {
+  opacity: 0;
+  left: 50%;
+  bottom: 0%;
+  transform: translateX(-50%);
+  letter-spacing: 2px;
+}
+
+.button:not(.idle):hover > .sky > .title {
+  opacity: 1;
+  color: var(--color-error);
+  left: 50%;
+  bottom: 50%;
+  transform: translate(-50%, 50%);
+  letter-spacing: 2px;
+}
+
+/* Sky */
+
+.sky {
+  min-width: 100%;
+  min-height: 100%;
+
   border-radius: 50%;
-  border: 12px dashed var(--color-on-error);
-  position: absolute;
-  transform: rotate(45deg);
-
-  animation-duration: 2.5s;
-  animation-iteration-count: infinite;
-  animation-name: borderRotated;
-  transition-timing-function: ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(
+    to bottom right,
+    var(--sky-start),
+    var(--sky-middle),
+    var(--sky-end)
+  );
 }
 
-.cancel {
-  transform: scale(1.2);
-  color: var(--color-on-error);
-  background-color: var(--color-error);  
-  
-  animation-duration: 2.5s;
-  animation-iteration-count: infinite;
-  animation-name: cancelIlluminating;
-  transition-timing-function: ease-in-out;
-  animation-fill-mode: backwards;
-}
+/* Title */
 
 .title {
-  color: inherit;
-  font-size: var(--title-medium);
-  font-weight: bold;
-  margin: 8px 0;
+  position: absolute;
+  color: #fdfbff;
+  transition: 3s;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
 }
 
-.icon {
-  color: inherit;
+/* Cloud */
+
+@keyframes moving {
+  from {
+    transform: translate(-15%, 15%) scale(0.9);
+  }
+
+  to {
+    transform: translate(15%, -15%) scale(1.1);
+  }
 }
 
-.show,
-.hide {
-  transition: 100ms;
+.cloud {
+  width: 50px;
+  position: absolute;
+  right: 40px;
+  bottom: 0;
+  rotate: -25deg;
+  filter: grayscale(0%);
+  animation: moving infinite ease-in-out alternate;
+  transition:
+    bottom 3s,
+    rotate 3s;
 }
 
-.show {
+.cloud1 {
+  filter: drop-shadow(0px 0px 1px var(--cloud1));
+}
+
+.cloud2 {
+  filter: drop-shadow(0px 0px 1px var(--cloud2));
+}
+
+.cloud3 {
+  filter: drop-shadow(0px 0px 1px var(--cloud3));
+}
+
+.cloud4 {
+  filter: drop-shadow(0px 0px 1px var(--cloud4));
+}
+
+.cloud5 {
+  filter: drop-shadow(0px 0px 1px var(--cloud5));
+}
+
+.cloud:nth-of-type(1) {
+  animation-duration: 18s;
+  left: 0%;
+}
+.cloud:nth-of-type(2) {
+  animation-duration: 15.3s;
+  bottom: 20%;
+}
+.cloud:nth-of-type(3) {
+  animation-duration: 17.2s;
+  bottom: 50%;
+  right: -20%;
+}
+
+.cloud:nth-of-type(4) {
+  animation-duration: 11.3s;
+  bottom: 14%;
+  left: 5%;
+}
+.cloud:nth-of-type(5) {
+  animation-duration: 13.6s;
+  bottom: 24%;
+  right: 10%;
+}
+.cloud:nth-of-type(6) {
+  animation-duration: 14s;
+  bottom: 4%;
+  right: 90%;
+}
+
+.cloud:nth-of-type(7) {
+  animation-duration: 7.8s;
+  bottom: 24%;
+  left: 55%;
+}
+.cloud:nth-of-type(8) {
+  animation-duration: 9.2s;
+  bottom: 4%;
+  right: 20%;
+}
+.cloud:nth-of-type(9) {
+  animation-duration: 8s;
+  left: -20%;
+}
+
+.cloud:nth-of-type(10) {
+  animation-duration: 10.5s;
+  left: 55%;
+  bottom: 5%;
+}
+.cloud:nth-of-type(11) {
+  animation-duration: 9s;
+  left: 70%;
+  bottom: 35%;
+}
+.cloud:nth-of-type(12) {
+  animation-duration: 10s;
+  left: 10%;
+  bottom: -10%;
+}
+
+.cloud:nth-of-type(13) {
+  animation-duration: 12s;
+  left: 55%;
+  bottom: 5%;
+}
+
+.cloud:nth-of-type(14) {
+  animation-duration: 12s;
+  left: 50%;
+  bottom: -20%;
+}
+
+/* Border */
+
+@keyframes rotation {
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@property --coloring {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: var(--cloud3);
+}
+
+button::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  background: conic-gradient(var(--coloring) 0%, transparent 50%);
+  filter: drop-shadow(0px 0px 8px var(--coloring));
+  animation: rotation 2s infinite linear;
+  border-radius: 50%;
+  transition: opacity 3s;
   opacity: 1;
 }
 
-.hide {
-  opacity: 0;
+button:not(.idle):hover::before {
+  --coloring: var(--color-error);
 }
