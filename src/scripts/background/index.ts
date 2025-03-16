@@ -20,3 +20,12 @@ async function handleConnect(port: Port) {
 }
 
 browser.runtime.onConnect.addListener(handleConnect);
+
+browser.action.onClicked.addListener(() => {
+  browser.windows.create({
+    width: 300,
+    height: 500,
+    type: "popup",
+    url: browser.runtime.getURL("popup/index.html"),
+  });
+});

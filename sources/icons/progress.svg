@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="268.42108"
+   height="80"
+   viewBox="0 0 268.42108 80"
+   version="1.1"
+   id="SVGRoot"
+   sodipodi:docname="progress.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview492"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="1"
+     inkscape:cx="160.5"
+     inkscape:cy="-66.5"
+     inkscape:window-width="1366"
+     inkscape:window-height="731"
+     inkscape:window-x="26"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid615"
+       originx="-20"
+       originy="-110" />
+    <sodipodi:guide
+       position="130.03922,186.33188"
+       orientation="1,0"
+       id="guide5167"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs487" />
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-20,-110)">
+    <path
+       id="path5534"
+       style="fill:#36b544;fill-opacity:1;stroke-width:1.18666"
+       d="M 57.50391,110 H 20 l 25,40 -25,40 h 37.7207 z" />
+    <path
+       id="path5621"
+       style="fill:#36b544;fill-opacity:1;stroke-width:1.18666"
+       d="m 250.925,110 0.21679,80 h 12.2793 l 25,-40 -25,-40 z" />
+    <rect
+       style="fill:#36b544;fill-opacity:1;stroke-width:1.82879"
+       id="rect5624"
+       width="200"
+       height="80"
+       x="52"
+       y="110" />
+  </g>
+</svg>

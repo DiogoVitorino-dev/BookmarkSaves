@@ -54,8 +54,7 @@
 
   "action": {
     "default_icon": "assets/icons/bookmark_48.jpg",
-    "default_title": "BookmarkSaves",
-    "default_popup": "popup/index.html"
+    "default_title": "BookmarkSaves"
   },
 
   "content_security_policy": {

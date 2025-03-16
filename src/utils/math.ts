@@ -19,17 +19,20 @@ function interpolate(
   input: InterpolateRange,
   output: InterpolateRange
 ) {
-  // Ensures the value is within the input range
-  value = Math.max(input.min, Math.min(input.max, value));
+  // Ordena os valores de entrada para garantir interpolação correta
+  const [inputMin, inputMax] =
+    input.min < input.max ? [input.min, input.max] : [input.max, input.min];
+  const [outputMin, outputMax] =
+    output.min < output.max
+      ? [output.min, output.max]
+      : [output.max, output.min];
 
-  let interpolated =
-    output.min +
-    ((value - input.min) / (input.max - input.min)) * (output.max - output.min);
+  // Restringe o valor dentro do intervalo de entrada
+  value = Math.max(inputMin, Math.min(inputMax, value));
 
-  // Ensure the interpolated value is within the output range
-  interpolated = Math.max(output.min, Math.min(output.max, interpolated));
-
-  return interpolated;
+  // Calcula a interpolação corretamente, respeitando inversões
+  const t = (value - inputMin) / (inputMax - inputMin);
+  return outputMin + t * (outputMax - outputMin);
 }
 
 const closest = (target: number, ...values: number[]) =>

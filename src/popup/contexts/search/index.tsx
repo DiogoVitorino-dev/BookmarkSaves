@@ -16,26 +16,26 @@ import { XRepository } from "@repository/x";
 import { BrowserAPI } from "@api/browser";
 import { ToolsAPI } from "@api/tools";
 
+export type SearchState = "unavailable" | "available" | "searching";
+
 export interface SearchContext {
-  available: boolean;
+  state: SearchState;
   loaded: boolean;
 
   breakpoint: string;
   setBreakpoint: (newBreakpoint: string) => void;
 
-  searching: boolean;
   search: () => Promise<void>;
   cancel: () => void;
 }
 
 const Context = createContext<SearchContext>({
-  available: false,
+  state: "unavailable",
   loaded: false,
 
   breakpoint: "",
   setBreakpoint: () => {},
 
-  searching: false,
   search: async () => {},
   cancel: () => {},
 });
@@ -48,15 +48,14 @@ interface ProviderProps {
 
 export default function SearchProvider({ children }: ProviderProps) {
   const [loaded, setLoaded] = useState(false);
-  const [searching, setSearching] = useState(false);
+  const [state, setState] = useState<SearchState>("unavailable");
   const [breakpoint, setBreakpoint] = useState("");
-  const [available, setAvailable] = useState(false);
   const debounceBreakpoint = useDebounce(breakpoint);
 
   const url = useRef<string>("");
 
   const search = useCallback(async () => {
-    setSearching(true);
+    setState("searching");
 
     switch (UrlUtils.match(url.current)) {
       case "instagram":
@@ -67,21 +66,22 @@ export default function SearchProvider({ children }: ProviderProps) {
         break;
     }
 
-    setSearching(false);
+    checkSearchAvailability();
   }, [breakpoint]);
 
   const cancel = useCallback(async () => {
-    if (searching) setSearching(false);
+    setState("unavailable");
 
-    await ToolsAPI().cancelSearch();
-  }, [searching]);
+    await ToolsAPI().cancelSearch().finally(checkSearchAvailability);
+  }, []);
 
   const handleSetBreakpoint = useCallback((newValue: string) => {
     setBreakpoint(newValue);
   }, []);
 
   const checkSearchAvailability = () => {
-    if (UrlUtils.match(url.current)) setAvailable(true);
+    if (UrlUtils.match(url.current)) setState("available");
+    else setState("unavailable");
   };
 
   const getSavedBreakpoint = async () => {
@@ -98,10 +98,8 @@ export default function SearchProvider({ children }: ProviderProps) {
 
   const isSearching = useCallback(async () => {
     if (await ToolsAPI().isSearching()) {
-      setSearching(true);
-      ToolsAPI()
-        .waitForSearch()
-        .finally(() => setSearching(false));
+      setState("searching");
+      ToolsAPI().waitForSearch().finally(checkSearchAvailability);
     }
   }, []);
 
@@ -136,23 +134,14 @@ export default function SearchProvider({ children }: ProviderProps) {
 
   const value = useMemo<SearchContext>(
     () => ({
-      searching,
-      available,
+      state,
       loaded,
       breakpoint,
       setBreakpoint: handleSetBreakpoint,
       search,
       cancel,
     }),
-    [
-      searching,
-      loaded,
-      available,
-      breakpoint,
-      handleSetBreakpoint,
-      search,
-      cancel,
-    ]
+    [state, loaded, breakpoint, handleSetBreakpoint, search, cancel]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

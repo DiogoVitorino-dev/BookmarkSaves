@@ -1,6 +1,7 @@
-import React, { useCallback, useRef } from "react";
+import React from "react";
 import * as styles from "./styles.module.css";
 import Strings from "@constants/Strings";
+import { cloudAnimation } from "./animation";
 import { useSearch } from "@contexts/search";
 
 const cloud1 = browser.runtime.getURL("./assets/svgs/cloud1.svg");
@@ -9,105 +10,101 @@ const cloud3 = browser.runtime.getURL("./assets/svgs/cloud3.svg");
 const cloud4 = browser.runtime.getURL("./assets/svgs/cloud4.svg");
 const cloud5 = browser.runtime.getURL("./assets/svgs/cloud5.svg");
 
+export type State = "unavailable" | "available" | "searching";
+
+function buttonRef(element: HTMLButtonElement | null) {
+  cloudAnimation(element?.getElementsByClassName(styles.cloud));
+}
+
 export default function SearchButton() {
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const { searching, available, cancel, search } = useSearch();
+  const { state, cancel, search } = useSearch();
 
-  const handleSearch = useCallback(
-    () => (searching ? cancel() : search()),
-    [search, cancel, searching]
-  );
-
-  const handleClick = useCallback(async () => {
-    await handleSearch();
-    const button = buttonRef.current?.getElementsByClassName("button").item(0);
-    const title = buttonRef.current?.getElementsByClassName("title").item(0);
-
-    if (!button || !title) return;
-
-    const onTransitionEnd = (event: Event) => {
-      if ("propertyName" in event && event.propertyName === "letter-spacing") {
-        title.textContent = Strings.cancelSearch;
-        title.removeEventListener("transitionend", onTransitionEnd);
-      }
-    };
-
-    if (button.classList.toggle("idle")) {
-      title.textContent = Strings.search;
-    } else {
-      title.addEventListener("transitionend", onTransitionEnd);
-    }
-  }, [handleSearch]);
+  const handleClick = () => (state === "searching" ? cancel() : search());
 
   return (
     <button
-      ref={buttonRef}
-      className={`${styles.button} ${styles.idle}`}
+      disabled={state === "unavailable"}
       onClick={handleClick}
-      disabled={!available}
+      ref={buttonRef}
+      className={`${styles.button} ${
+        state === "searching" ? styles.searching : ""
+      } ${state === "available" ? styles.available : ""}`}
     >
-      <div className={`${styles.sky}`}>
-        <span className={`${styles.title}`}>{Strings.search}</span>
-        <object
-          className={`${styles.cloud} ${styles.cloud3}`}
-          data={cloud3}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud3}`}
-          data={cloud3}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud3}`}
-          data={cloud3}
-        ></object>
+      <div
+        className={`${styles.loading}`}
+        style={{ opacity: state === "searching" ? 1 : 0 }}
+      />
 
-        <object
-          className={`${styles.cloud} ${styles.cloud1}`}
-          data={cloud1}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud1}`}
-          data={cloud1}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud1}`}
-          data={cloud1}
-        ></object>
+      <div className={`${styles.content}`}>
+        <span className={`${styles.title}`}>
+          {state === "searching" ? Strings.cancelSearch : Strings.search}
+        </span>
+        <div className={`${styles.sky}`}>
+          <img
+            className={`${styles.cloud} ${styles.cloud3}`}
+            src={cloud3}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud3}`}
+            src={cloud3}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud3}`}
+            src={cloud3}
+          ></img>
 
-        <object
-          className={`${styles.cloud} ${styles.cloud2}`}
-          data={cloud2}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud2}`}
-          data={cloud2}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud2}`}
-          data={cloud2}
-        ></object>
+          <img
+            className={`${styles.cloud} ${styles.cloud1}`}
+            src={cloud1}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud1}`}
+            src={cloud1}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud1}`}
+            src={cloud1}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud1}`}
+            src={cloud1}
+          ></img>
 
-        <object
-          className={`${styles.cloud} ${styles.cloud4}`}
-          data={cloud4}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud4}`}
-          data={cloud4}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud4}`}
-          data={cloud4}
-        ></object>
+          <img
+            className={`${styles.cloud} ${styles.cloud2}`}
+            src={cloud2}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud2}`}
+            src={cloud2}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud2}`}
+            src={cloud2}
+          ></img>
 
-        <object
-          className={`${styles.cloud} ${styles.cloud5}`}
-          data={cloud5}
-        ></object>
-        <object
-          className={`${styles.cloud} ${styles.cloud5}`}
-          data={cloud5}
-        ></object>
+          <img
+            className={`${styles.cloud} ${styles.cloud4}`}
+            src={cloud4}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud4}`}
+            src={cloud4}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud4}`}
+            src={cloud4}
+          ></img>
+
+          <img
+            className={`${styles.cloud} ${styles.cloud5}`}
+            src={cloud5}
+          ></img>
+          <img
+            className={`${styles.cloud} ${styles.cloud5}`}
+            src={cloud5}
+          ></img>
+        </div>
       </div>
     </button>
   );
